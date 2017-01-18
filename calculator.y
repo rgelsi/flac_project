@@ -1,4 +1,10 @@
 %{
+int yylex();
+void yyerror(char *s);
+
+extern int tokenwert;
+extern int zeilennr;
+
 #define prompt printf("\n%5d : ",++zeilennr)
 %}
 
@@ -12,14 +18,14 @@ zeilen  :                                           /* leeres Symbol (Epsilon) *
         ;
 
 ausdruck: ausdruck PLUS term { $$ = $1 + $3; }
-        | ausdruck MINUS term { $$ = $1 – $3; }
+        | ausdruck MINUS term { $$ = $1 - $3; }
         | term { $$ = $1; }
         ;
 
 term    : term MULT factor { $$ = $1 * $3; }
         | term DIV factor { $$ = $1 / $3; }
         | factor { $$ = $1; }
-        ; 
+        ;
 
 factor  : AUF ausdruck ZU { $$ = $2; }
         | ZAHL { $$ = tokenwert; }
@@ -33,4 +39,11 @@ factor  : AUF ausdruck ZU { $$ = $2; }
 void yyerror(char *s)       /* Routine wird bei Fehler aufgerufen */
 {                           /* und gibt Fehlermeld. `s' aus, was */
     printf("%s\n", s);      /* die Meldung 'syntax error' ist. */
+}
+
+int main(void)
+{
+ printf("%5d : ", zeilennr);
+ yyparse();
+ return(0);
 }
