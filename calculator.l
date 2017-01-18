@@ -5,21 +5,21 @@
 #include <ctype.h>
 #include <stdio.h>
 
-int tokenwert = NICHTS;     /*Programmglob. Var., der im Falle */
-                            /* einer Zahl Zahlenwert zugew. Wird */
-int zeilennr = 1;           /* Programmg. Variable: enthaelt immer */
+int tokenvalue = EMPTY;     /*Programmglob. Var., der im Falle */
+                            /* einer Zahl Zahlenwert CLOSEgew. Wird */
+int rowno = 1;           /* Programmg. Variable: enthaelt immer */
                             /* Nummer der aktuellen Eingabezeile */
 %}
 %%
 
 [ \t]+  ;                   /* Leer- und Tabzeichen ueberlesen */
-\n      { return(ZEILENENDE); }
-[0-9]+  { tokenwert = strtol(yytext,NULL,10); return(ZAHL); }
+\n      { return(ENDOFLINE); }
+[0-9]+  { tokenvalue = strtol(yytext,NULL,10); return(NUM); }
 "+"     { return(PLUS); }
 "-"     { return(MINUS); }
 "*"     { return(MULT); }
 "/"     { return(DIV); }
-"("     { return(AUF); }
-")"     { return(ZU); }
-.       { tokenwert = yytext[0]; return(NICHTS); }
+"("     { return(OPEN); }
+")"     { return(CLOSE); }
+.       { tokenvalue = yytext[0]; return(EMPTY); }
 %%
