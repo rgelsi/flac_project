@@ -1,13 +1,13 @@
 - Wurzel:       sqrt(5)
-- Hoch:         2ˆ3
+✓- Hoch:         2ˆ3
 - Constanten:   e, pi, ...
 - e hoch:       eˆ3
-- Facultät:     3!
+✓- Facultät:     3!
 - Nullen:       4E3     = 4000
 - Prozent:      20 - 10% = 18
 - Modulo:       10 MOD 3 oder MOD(10,3) oder 10%3 statt Prozent
 
-- Kommazahlen:  2.34566
+✓- Kommazahlen:  2.34566
 
 --------------------------------
 - log10, ln

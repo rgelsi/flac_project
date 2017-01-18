@@ -3,26 +3,32 @@ int yylex();
 void yyerror(char *s);
 
 extern int rowno;
+extern double fac(double __x);
 
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <stdio.h>
+#include <math.h>
 
 #define prompt printf("\n%5d : ",++rowno)
 %}
 
 %union {
     double value;			//value of an identifier of type NUM
+    int digit;
 }
 
 %start line
 %token <value> NUM
-%token PLUS MINUS MULT DIV OPEN CLOSE ENDOFLINE EMPTY
+%token <digit> DIGIT
+%token PLUS MINUS MULT DIV POW FACT OPEN CLOSE ENDOFLINE EMPTY
 
 %type <value> expr
 %type <value> term
 %type <value> factor
+%type <value> factorial
+%type <value> final
 
 %%
 
@@ -40,7 +46,15 @@ term    : term MULT factor { $$ = $1 * $3; }
         | factor { $$ = $1; }
         ;
 
-factor  : OPEN expr CLOSE { $$ = $2; }
+factor  : factor POW factorial { $$ = pow( $1, $3 ); }
+        | factorial { $$ = $1; }
+        ;
+
+factorial   : factorial FACT { $$ = fac($1); }
+            | final { $$ = $1; }
+            ;
+
+final   : OPEN expr CLOSE { $$ = $2; }
         | NUM { $$ = $1; }
         | MINUS NUM { $$ = -$2; }
         ;
