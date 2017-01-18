@@ -2,20 +2,32 @@
 int yylex();
 void yyerror(char *s);
 
-extern int tokenvalue;
 extern int rowno;
 
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 #include <stdio.h>
+
 #define prompt printf("\n%5d : ",++rowno)
 %}
 
+%union {
+    double value;			//value of an identifier of type NUM
+}
+
 %start line
-%token PLUS MINUS MULT DIV OPEN CLOSE NUM ENDOFLINE EMPTY
+%token <value> NUM
+%token PLUS MINUS MULT DIV OPEN CLOSE ENDOFLINE EMPTY
+
+%type <value> expr
+%type <value> term
+%type <value> factor
 
 %%
 
-line    :                                           /* leeres Symbol (Epsilon) */
-        | expr {printf("%d",$1); prompt;} ENDOFLINE line
+line    : /* leeres Symbol (Epsilon) */
+        | expr {printf("%f",$1); prompt;} ENDOFLINE line
         ;
 
 expr    : expr PLUS term { $$ = $1 + $3; }
@@ -29,8 +41,8 @@ term    : term MULT factor { $$ = $1 * $3; }
         ;
 
 factor  : OPEN expr CLOSE { $$ = $2; }
-        | NUM { $$ = tokenvalue; }
-        | MINUS NUM { $$ = -tokenvalue; }
+        | NUM { $$ = $1; }
+        | MINUS NUM { $$ = -$2; }
         ;
 
 %%
