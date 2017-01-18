@@ -5,10 +5,10 @@
 #include <ctype.h>
 #include <stdio.h>
 
-int tokenvalue = EMPTY;     /*Programmglob. Var., der im Falle */
-                            /* einer Zahl Zahlenwert CLOSEgew. Wird */
-int rowno = 1;           /* Programmg. Variable: enthaelt immer */
-                            /* Nummer der aktuellen Eingabezeile */
+int tokenvalue = EMPTY;     /* Programmglobale Variable, der im Falle */
+                            /* einer Zahl Zahlenwert zugewiesen wird. */
+int rowno = 1;              /* Programmglob. Variable: */
+                            /* enthaelt immer Nummer der akt. Eingabezeile */
 %}
 %%
 
@@ -19,6 +19,7 @@ int rowno = 1;           /* Programmg. Variable: enthaelt immer */
 "-"     { return(MINUS); }
 "*"     { return(MULT); }
 "/"     { return(DIV); }
+"^"     { return(POW); }
 "("     { return(OPEN); }
 ")"     { return(CLOSE); }
 .       { tokenvalue = yytext[0]; return(EMPTY); }

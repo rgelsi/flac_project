@@ -1,0 +1,20 @@
+- Wurzel:       sqrt(5)
+- Hoch:         2ˆ3
+- Constanten:   e, pi, ...
+- e hoch:       eˆ3
+- Facultät:     3!
+- Nullen:       4E3     = 4000
+- Prozent:      20 - 10% = 18
+
+- Kommazahlen:  2.34566
+
+--------------------------------
+- log10, ln
+- Variablen:    A = 5+5
+                A+3 = 13
+- Binär in Dezimal und umgekehrt
+- Mittelwert, ...
+- Summe E(expr,var,low,high):   E(i*2,i,0,10) = 110
+- Produkt -"-
+- Absolutwert   abs(-3) = 3
+-

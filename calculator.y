@@ -14,7 +14,7 @@ extern int rowno;
 
 %%
 
-line  :                                           /* leeres Symbol (Epsilon) */
+line    :                                           /* leeres Symbol (Epsilon) */
         | expr {printf("%d",$1); prompt;} ENDOFLINE line
         ;
 
