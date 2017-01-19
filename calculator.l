@@ -7,14 +7,6 @@
 int rowno = 1;              /* Programmglob. Variable: */
                             /* enthaelt immer Nummer der akt. Eingabezeile */
 
-double fac(double x) {
-    if(x==0){
-        return (double) 1;
-    }else{
-        return (x*fac(x-1));
-    }
-}
-
 %}
 
 DIGIT    [0-9]
@@ -32,6 +24,9 @@ NUM      {DIGIT}+(\.{DIGIT}+)?
 "/"     { return(DIV); }
 "^"     { return(POW); }
 "!"     { return(FACT); }
+"E"     { return(EXP); }
+[mM][oO][dD]   { return(MOD); }
+","     { return(COMMA); }
 "("     { return(OPEN); }
 ")"     { return(CLOSE); }
 %%

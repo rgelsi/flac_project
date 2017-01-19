@@ -3,13 +3,20 @@ int yylex();
 void yyerror(char *s);
 
 extern int rowno;
-extern double fac(double __x);
 
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <math.h>
+
+double fac(double x) {
+    if(x==0){
+        return (double) 1;
+    }else{
+        return (x*fac(x-1));
+    }
+}
 
 #define prompt printf("\n%5d : ",++rowno)
 %}
@@ -22,12 +29,12 @@ extern double fac(double __x);
 %start line
 %token <value> NUM
 %token <digit> DIGIT
-%token PLUS MINUS MULT DIV POW FACT OPEN CLOSE ENDOFLINE EMPTY
-
+%token PLUS MINUS MULT DIV POW FACT MOD COMMA EXP OPEN CLOSE ENDOFLINE EMPTY
 %type <value> expr
 %type <value> term
 %type <value> factor
 %type <value> factorial
+%type <value> exponent
 %type <value> final
 
 %%
@@ -51,10 +58,15 @@ factor  : factor POW factorial { $$ = pow( $1, $3 ); }
         ;
 
 factorial   : factorial FACT { $$ = fac($1); }
-            | final { $$ = $1; }
+            | exponent { $$ = $1; }
             ;
 
-final   : OPEN expr CLOSE { $$ = $2; }
+exponent: exponent EXP final { $$ = $1 * pow( 10, $3 ); }
+        | final { $$ = $1; }
+        ;
+
+final   : MOD OPEN expr COMMA expr CLOSE { $$ = fmod( $3, $5 ); }
+        | OPEN expr CLOSE { $$ = $2; }
         | NUM { $$ = $1; }
         | MINUS NUM { $$ = -$2; }
         ;
