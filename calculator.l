@@ -35,12 +35,18 @@ NUM      {DIGIT}+(\.{DIGIT}+)?
 [mM][eE][aA][nN]   { return(MEAN); }    // Mean of a list
 [sS][uU][mM][lL]   { return(SUML); }    // Sum of a list
 [pP][rR][oO][dD][uU][cC][tT][lL]    { return(PRODL); }    // Sum of a list
-[aA][nN][sS]   { return(ANS); }         // Sinus
+[bB][iI][nN]   { return(BIN); }         // Binary
+[dD][eE][cC]   { return(DEC); }         // Dezimal
+[aA][nN][sS]   { return(ANS); }         // Answer
 ","     { return(COMMA); }              // Separate expressions
 "("     { return(OPEN); }
 ")"     { return(CLOSE); }
 "{"     { return(CURO); }
 "}"     { return(CURC); }
+"["     { return(SQBO); }
+"]"     { return(SQBC); }
+"->"    { return(ARROW); }
+
 
 [eE][xX][iI][tT]   { return(EXIT); }    // Exit
 %%

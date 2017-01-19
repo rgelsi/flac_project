@@ -36,7 +36,7 @@ double fac(double x) {
 %start line
 %token <value> NUM
 %token <digit> DIGIT
-%left PLUS MINUS MULT DIV POW FACT MOD COMMA EXP EUL PI SQRT ABS COS SIN MEAN SUML PRODL ANS OPEN CLOSE CURO CURC ENDOFLINE EMPTY EXIT
+%left PLUS MINUS MULT DIV POW FACT MOD COMMA EXP EUL PI SQRT ABS COS SIN MEAN SUML PRODL ANS BIN DEC ARROW OPEN CLOSE CURO CURC SQBO SQBC ENDOFLINE EMPTY EXIT
 %right PROZENT
 %type <value> expr
 %type <value> term
@@ -65,7 +65,7 @@ expr    : expr PLUS term PROZENT { $$ = $1 + $1 * $3 / 100; }
 term    : term MULT power { $$ = $1 * $3; }
         | term DIV power { $$ = $1 / $3; }
         | term MULT power PROZENT { $$ = ($1 * $3) / 100; }
-        | term DIV power PROZENT { $$ = ($1 / $3) * 100; }
+        | term DIV power PROZENT { $$ = $1 / ($3 / 100); }
         | power { $$ = $1; }
         ;
 
