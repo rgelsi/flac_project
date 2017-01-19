@@ -26,13 +26,13 @@ double fac(double x) {
 
 %union {
     double value;			//value of an identifier of type NUM
-    int digit;
+    int digit;              //value of an identifier of type DIGIT
 }
 
 %start line
 %token <value> NUM
 %token <digit> DIGIT
-%token PLUS MINUS MULT DIV POW FACT MOD COMMA EXP EUL PI SQRT ABS COS SIN OPEN CLOSE ENDOFLINE EMPTY
+%token PLUS MINUS MULT DIV POW FACT MOD COMMA EXP EUL PI SQRT ABS COS SIN MEAN SUML PRODL OPEN CLOSE CURO CURC ENDOFLINE EMPTY
 %type <value> expr
 %type <value> term
 %type <value> factor
@@ -40,9 +40,12 @@ double fac(double x) {
 %type <value> exponent
 %type <value> final
 
+%type <value> sumlist
+%type <value> prodlist
+
 %%
 
-line    : /* leeres Symbol (Epsilon) */
+line    : // Empty
         | expr {printf("%f",$1); prompt;} ENDOFLINE line
         ;
 
@@ -74,19 +77,30 @@ final   : MOD OPEN expr COMMA expr CLOSE { $$ = fmod( $3, $5 ); }
         | ABS OPEN expr CLOSE { $$ = fabs( $3 ); }
         | COS OPEN expr CLOSE { $$ = cos( $3 ); }
         | SIN OPEN expr CLOSE { $$ = sin( $3 ); }
+        | SUML OPEN CURO sumlist CURC CLOSE { $$ = $4 ; }
+        | PRODL OPEN CURO prodlist CURC CLOSE { $$ = $4 ; }
         | OPEN expr CLOSE { $$ = $2; }
         | PI { $$ = pi; }
         | NUM { $$ = $1; }
         | MINUS NUM { $$ = -$2; }
         ;
 
+sumlist : expr COMMA sumlist { $$ = $1 + $3; }
+        | expr  { $$ = $1; }
+        ;
+
+prodlist: expr COMMA prodlist { $$ = $1 * $3; }
+        | expr  { $$ = $1; }
+        ;
+
+
 %%
 
 #include "lex.yy.c"
 
-void yyerror(char *s)       /* Routine wird bei Fehler aufgerufen */
-{                           /* und gibt Fehlermeld. `s' aus, was */
-    printf("%s\n", s);      /* die Meldung 'syntax error' ist. */
+void yyerror(char *s)
+{
+    printf("%s\n", s);
 }
 
 int main(void)
@@ -95,3 +109,11 @@ int main(void)
  yyparse();
  return(0);
 }
+
+
+/*main()
+{
+  extern int yydebug;
+  yydebug = 1;
+  return yyparse();
+}*/

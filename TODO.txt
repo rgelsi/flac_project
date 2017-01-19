@@ -2,27 +2,30 @@ TI-92
 
 ✓- Wurzel:           sqrt(5)
 ✓- Hoch:            2ˆ3
-- Konstanten:       ✓e, ✓pi, ...
+✓- Konstanten:       ✓e, ✓pi, ...
 ✓- e hoch:           eˆ(3)
 ✓- Facultät:        3!
 ✓- Exponent Nullen: 4E3     = 4000
 - Prozent:          20 - 10% = 18
 ✓- Modulo:          MOD(10,3)
-
+✓- Absolutwert   abs(-3) = 3
 ✓- Kommazahlen:     2.34566
 
---------------------------------
+✓- Summe und Product einer Liste:      suml({1,2,3,4}) und productl({1,2,3,4})
+
 - log10, ln
-- Variablen:    A = 5+5
-                A+3 = 13
 - Binär in Dezimal und umgekehrt
 - Mittelwert, ...
 - Summe E(expr,var,low,high):   E(i*2,i,0,10) = 110
 - Produkt -"-
-✓- Absolutwert   abs(-3) = 3
 - Mit vorherigen Ergebnis rechnen:  2+3 = 5
                                     ans*3 = 15
 
--
+
+
+
+
+- Variablen:    A = 5+5
+                A+3 = 13
 
 https://www.tutorialspoint.com/c_standard_library/math_h.htm

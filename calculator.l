@@ -4,8 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int rowno = 1;              /* Programmglob. Variable: */
-                            /* enthaelt immer Nummer der akt. Eingabezeile */
+int rowno = 1;                          // Number of row
 
 %}
 
@@ -14,25 +13,30 @@ NUM      {DIGIT}+(\.{DIGIT}+)?
 
 %%
 
-[ \t]+  ;                   /* Leer- und Tabzeichen ueberlesen */
-\n      { return(ENDOFLINE); }
+[ \t]+  ;                               // Ignore blank space tab
+\n      { return(ENDOFLINE); }          // Enter
 {NUM}   { yylval.value = atof(yytext);
             return NUM; }
 "+"     { return(PLUS); }
 "-"     { return(MINUS); }
 "*"     { return(MULT); }
 "/"     { return(DIV); }
-"^"     { return(POW); }
-"!"     { return(FACT); }
-"e"     { return(EUL); }
-[pP][iI]   { return(PI); }
-"E"     { return(EXP); }
-[mM][oO][dD]   { return(MOD); }
-[sS][qQ][rR][tT]   { return(SQRT); }
-[aA][bB][sS]   { return(ABS); }
-[cC][oO][sS]   { return(COS); }
-[sS][iI][nN]   { return(SIN); }
-","     { return(COMMA); }
+"^"     { return(POW); }                // Power
+"!"     { return(FACT); }               // Factorial
+"e"     { return(EUL); }                // Constant e
+[pP][iI]   { return(PI); }              // Constant PI
+"E"     { return(EXP); }                // E notation
+[mM][oO][dD]   { return(MOD); }         // Modulo
+[sS][qQ][rR][tT]   { return(SQRT); }    // Square root
+[aA][bB][sS]   { return(ABS); }         // Absolute value
+[cC][oO][sS]   { return(COS); }         // Cosinus
+[sS][iI][nN]   { return(SIN); }         // Sinus
+[mM][eE][aA][nN]   { return(MEAN); }    // Mean of a list
+[sS][uU][mM][lL]   { return(SUML); }    // Sum of a list
+[pP][rR][oO][dD][uU][cC][tT][lL]   { return(PRODL); }    // Sum of a list
+","     { return(COMMA); }              // Separate expressions
 "("     { return(OPEN); }
 ")"     { return(CLOSE); }
+"{"     { return(CURO); }
+"}"     { return(CURC); }
 %%
