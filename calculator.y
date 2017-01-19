@@ -25,7 +25,6 @@ double fac(double x) {
 %}
 
 %union {
-    char* lexeme;			//identifier
     double value;			//value of an identifier of type NUM
     int digit;
 }
@@ -33,7 +32,6 @@ double fac(double x) {
 %start line
 %token <value> NUM
 %token <digit> DIGIT
-%token <lexeme> ID
 %token PLUS MINUS MULT DIV POW FACT MOD COMMA EXP EUL PI SQRT ABS COS SIN OPEN CLOSE ENDOFLINE EMPTY
 %type <value> expr
 %type <value> term
