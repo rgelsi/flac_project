@@ -29,6 +29,7 @@ NUM      {DIGIT}+(\.{DIGIT}+)?
 "E"     { return(EXP); }
 [mM][oO][dD]   { return(MOD); }
 [sS][qQ][rR][tT]   { return(SQRT); }
+[aA][bB][sS]   { return(ABS); }
 ","     { return(COMMA); }
 "("     { return(OPEN); }
 ")"     { return(CLOSE); }

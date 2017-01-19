@@ -19,7 +19,7 @@ TI-92
 - Mittelwert, ...
 - Summe E(expr,var,low,high):   E(i*2,i,0,10) = 110
 - Produkt -"-
-- Absolutwert   abs(-3) = 3
+✓- Absolutwert   abs(-3) = 3
 - Mit vorherigen Ergebnis rechnen:  2+3 = 5
                                     ans*3 = 15
 
