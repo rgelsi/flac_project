@@ -35,7 +35,7 @@ double fac(double x) {
 %token PLUS MINUS MULT DIV POW FACT MOD COMMA EXP EUL PI SQRT ABS COS SIN MEAN SUML PRODL OPEN CLOSE CURO CURC ENDOFLINE EMPTY
 %type <value> expr
 %type <value> term
-%type <value> factor
+%type <value> power
 %type <value> factorial
 %type <value> exponent
 %type <value> final
@@ -54,12 +54,12 @@ expr    : expr PLUS term { $$ = $1 + $3; }
         | term { $$ = $1; }
         ;
 
-term    : term MULT factor { $$ = $1 * $3; }
-        | term DIV factor { $$ = $1 / $3; }
-        | factor { $$ = $1; }
+term    : term MULT power { $$ = $1 * $3; }
+        | term DIV power { $$ = $1 / $3; }
+        | power { $$ = $1; }
         ;
 
-factor  : factor POW factorial { $$ = pow( $1, $3 ); }
+power   : power POW factorial { $$ = pow( $1, $3 ); }
         | factorial { $$ = $1; }
         ;
 
@@ -110,7 +110,7 @@ int main(void)
  return(0);
 }
 
-
+// Debug
 /*main()
 {
   extern int yydebug;
