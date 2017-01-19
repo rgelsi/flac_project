@@ -18,6 +18,9 @@ double fac(double x) {
     }
 }
 
+#define e  2.71828182845904523536028747135266249775724709369995
+#define pi 3.14159265358979323846264338327950288419716939937510
+
 #define prompt printf("\n%5d : ",++rowno)
 %}
 
@@ -29,7 +32,7 @@ double fac(double x) {
 %start line
 %token <value> NUM
 %token <digit> DIGIT
-%token PLUS MINUS MULT DIV POW FACT MOD COMMA EXP OPEN CLOSE ENDOFLINE EMPTY
+%token PLUS MINUS MULT DIV POW FACT MOD COMMA EXP EUL PI SQRT OPEN CLOSE ENDOFLINE EMPTY
 %type <value> expr
 %type <value> term
 %type <value> factor
@@ -66,7 +69,10 @@ exponent: exponent EXP final { $$ = $1 * pow( 10, $3 ); }
         ;
 
 final   : MOD OPEN expr COMMA expr CLOSE { $$ = fmod( $3, $5 ); }
+        | EUL POW OPEN expr CLOSE { $$ = pow( e, $4 ); }
+        | SQRT OPEN expr CLOSE { $$ = sqrt( $3 ); }
         | OPEN expr CLOSE { $$ = $2; }
+        | PI { $$ = pi; }
         | NUM { $$ = $1; }
         | MINUS NUM { $$ = -$2; }
         ;

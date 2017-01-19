@@ -1,7 +1,9 @@
-- Wurzel:           sqrt(5)
+TI-92
+
+✓- Wurzel:           sqrt(5)
 ✓- Hoch:            2ˆ3
-- Constanten:       e, pi, ...
-- e hoch:           eˆ3
+- Konstanten:       ✓e, ✓pi, ...
+✓- e hoch:           eˆ(3)
 ✓- Facultät:        3!
 ✓- Exponent Nullen: 4E3     = 4000
 - Prozent:          20 - 10% = 18

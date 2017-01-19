@@ -24,8 +24,11 @@ NUM      {DIGIT}+(\.{DIGIT}+)?
 "/"     { return(DIV); }
 "^"     { return(POW); }
 "!"     { return(FACT); }
+"e"     { return(EUL); }
+[pP][iI]   { return(PI); }
 "E"     { return(EXP); }
 [mM][oO][dD]   { return(MOD); }
+[sS][qQ][rR][tT]   { return(SQRT); }
 ","     { return(COMMA); }
 "("     { return(OPEN); }
 ")"     { return(CLOSE); }
