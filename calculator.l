@@ -23,20 +23,22 @@ NUM      {DIGIT}+(\.{DIGIT}+)?
 "/"     { return(DIV); }
 "^"     { return(POW); }                // Power
 "!"     { return(FACT); }               // Factorial
-"e"     { return(EUL); }                // Constant e
-[pP][iI]   { return(PI); }              // Constant PI
 "E"     { return(EXP); }                // E notation
-[mM][oO][dD]   { return(MOD); }         // Modulo
+"e"     { return(EUL); }                // Constant e
+[pP][iI]        { return(PI); }         // Constant PI
+[mM][oO][dD]    { return(MOD); }        // Modulo
 [sS][qQ][rR][tT]   { return(SQRT); }    // Square root
 [aA][bB][sS]   { return(ABS); }         // Absolute value
 [cC][oO][sS]   { return(COS); }         // Cosinus
 [sS][iI][nN]   { return(SIN); }         // Sinus
 [mM][eE][aA][nN]   { return(MEAN); }    // Mean of a list
 [sS][uU][mM][lL]   { return(SUML); }    // Sum of a list
-[pP][rR][oO][dD][uU][cC][tT][lL]   { return(PRODL); }    // Sum of a list
+[pP][rR][oO][dD][uU][cC][tT][lL]    { return(PRODL); }    // Sum of a list
 ","     { return(COMMA); }              // Separate expressions
 "("     { return(OPEN); }
 ")"     { return(CLOSE); }
 "{"     { return(CURO); }
 "}"     { return(CURC); }
+
+[eE][xX][iI][tT]   { return(EXIT); }    // Exit
 %%

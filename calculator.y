@@ -32,7 +32,7 @@ double fac(double x) {
 %start line
 %token <value> NUM
 %token <digit> DIGIT
-%token PLUS MINUS MULT DIV POW FACT MOD COMMA EXP EUL PI SQRT ABS COS SIN MEAN SUML PRODL OPEN CLOSE CURO CURC ENDOFLINE EMPTY
+%token PLUS MINUS MULT DIV POW FACT MOD COMMA EXP EUL PI SQRT ABS COS SIN MEAN SUML PRODL OPEN CLOSE CURO CURC ENDOFLINE EMPTY EXIT
 %type <value> expr
 %type <value> term
 %type <value> power
@@ -83,6 +83,7 @@ final   : MOD OPEN expr COMMA expr CLOSE { $$ = fmod( $3, $5 ); }
         | PI { $$ = pi; }
         | NUM { $$ = $1; }
         | MINUS NUM { $$ = -$2; }
+        | EXIT { exit(0); }
         ;
 
 sumlist : expr COMMA sumlist { $$ = $1 + $3; }
