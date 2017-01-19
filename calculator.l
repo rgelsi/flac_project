@@ -21,6 +21,7 @@ NUM      {DIGIT}+(\.{DIGIT}+)?
 "-"     { return(MINUS); }
 "*"     { return(MULT); }
 "/"     { return(DIV); }
+"%"     { return(PROZENT); }            // Prozent
 "^"     { return(POW); }                // Power
 "!"     { return(FACT); }               // Factorial
 "E"     { return(EXP); }                // E notation
@@ -34,6 +35,7 @@ NUM      {DIGIT}+(\.{DIGIT}+)?
 [mM][eE][aA][nN]   { return(MEAN); }    // Mean of a list
 [sS][uU][mM][lL]   { return(SUML); }    // Sum of a list
 [pP][rR][oO][dD][uU][cC][tT][lL]    { return(PRODL); }    // Sum of a list
+[aA][nN][sS]   { return(ANS); }         // Sinus
 ","     { return(COMMA); }              // Separate expressions
 "("     { return(OPEN); }
 ")"     { return(CLOSE); }

@@ -3,6 +3,9 @@ int yylex();
 void yyerror(char *s);
 
 extern int rowno;
+double ans = 0;
+
+int counter = 0;
 
 #include <stdlib.h>
 #include <string.h>
@@ -18,6 +21,7 @@ double fac(double x) {
     }
 }
 
+
 #define e  2.71828182845904523536028747135266249775724709369995
 #define pi 3.14159265358979323846264338327950288419716939937510
 
@@ -32,7 +36,8 @@ double fac(double x) {
 %start line
 %token <value> NUM
 %token <digit> DIGIT
-%token PLUS MINUS MULT DIV POW FACT MOD COMMA EXP EUL PI SQRT ABS COS SIN MEAN SUML PRODL OPEN CLOSE CURO CURC ENDOFLINE EMPTY EXIT
+%left PLUS MINUS MULT DIV POW FACT MOD COMMA EXP EUL PI SQRT ABS COS SIN MEAN SUML PRODL ANS OPEN CLOSE CURO CURC ENDOFLINE EMPTY EXIT
+%right PROZENT
 %type <value> expr
 %type <value> term
 %type <value> power
@@ -42,20 +47,25 @@ double fac(double x) {
 
 %type <value> sumlist
 %type <value> prodlist
+%type <value> meanlist
 
 %%
 
 line    : // Empty
-        | expr {printf("%f",$1); prompt;} ENDOFLINE line
+        | expr {ans = $1; printf("%f",$1); prompt;} ENDOFLINE line
         ;
 
-expr    : expr PLUS term { $$ = $1 + $3; }
+expr    : expr PLUS term PROZENT { $$ = $1 + $1 * $3 / 100; }
+        | expr MINUS term PROZENT { $$ = $1 - $1 * $3 / 100; }
+        | expr PLUS term { $$ = $1 + $3; }
         | expr MINUS term { $$ = $1 - $3; }
         | term { $$ = $1; }
         ;
 
 term    : term MULT power { $$ = $1 * $3; }
         | term DIV power { $$ = $1 / $3; }
+        | term MULT power PROZENT { $$ = ($1 * $3) / 100; }
+        | term DIV power PROZENT { $$ = ($1 / $3) * 100; }
         | power { $$ = $1; }
         ;
 
@@ -79,10 +89,12 @@ final   : MOD OPEN expr COMMA expr CLOSE { $$ = fmod( $3, $5 ); }
         | SIN OPEN expr CLOSE { $$ = sin( $3 ); }
         | SUML OPEN CURO sumlist CURC CLOSE { $$ = $4 ; }
         | PRODL OPEN CURO prodlist CURC CLOSE { $$ = $4 ; }
+        | MEAN OPEN CURO meanlist CURC CLOSE { $$ = $4 / counter ; counter = 0; }
         | OPEN expr CLOSE { $$ = $2; }
         | PI { $$ = pi; }
         | NUM { $$ = $1; }
         | MINUS NUM { $$ = -$2; }
+        | ANS { $$ = ans; }
         | EXIT { exit(0); }
         ;
 
@@ -92,6 +104,10 @@ sumlist : expr COMMA sumlist { $$ = $1 + $3; }
 
 prodlist: expr COMMA prodlist { $$ = $1 * $3; }
         | expr  { $$ = $1; }
+        ;
+
+meanlist: expr COMMA meanlist { counter++; $$ = $1 + $3; }
+        | expr  { counter++; $$ = $1; }
         ;
 
 
