@@ -12,12 +12,17 @@ int rowno = 1;              /* Programmglob. Variable: */
 DIGIT    [0-9]
 NUM      {DIGIT}+(\.{DIGIT}+)?
 
+LETTER   [a-zA-Z]
+ID       {LETTER}({LETTER}|{DIGIT})*
+
 %%
 
 [ \t]+  ;                   /* Leer- und Tabzeichen ueberlesen */
 \n      { return(ENDOFLINE); }
 {NUM}   { yylval.value = atof(yytext);
             return NUM; }
+{ID}     {yylval.lexeme = strdup(yytext);
+          return ID;}
 "+"     { return(PLUS); }
 "-"     { return(MINUS); }
 "*"     { return(MULT); }
@@ -30,7 +35,10 @@ NUM      {DIGIT}+(\.{DIGIT}+)?
 [mM][oO][dD]   { return(MOD); }
 [sS][qQ][rR][tT]   { return(SQRT); }
 [aA][bB][sS]   { return(ABS); }
+[cC][oO][sS]   { return(COS); }
+[sS][iI][nN]   { return(SIN); }
 ","     { return(COMMA); }
 "("     { return(OPEN); }
 ")"     { return(CLOSE); }
+"->"     { return(ASS); }
 %%

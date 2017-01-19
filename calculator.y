@@ -25,6 +25,7 @@ double fac(double x) {
 %}
 
 %union {
+    char* lexeme;			//identifier
     double value;			//value of an identifier of type NUM
     int digit;
 }
@@ -32,7 +33,7 @@ double fac(double x) {
 %start line
 %token <value> NUM
 %token <digit> DIGIT
-%token PLUS MINUS MULT DIV POW FACT MOD COMMA EXP EUL PI SQRT ABS OPEN CLOSE ENDOFLINE EMPTY
+%token PLUS MINUS MULT DIV POW FACT MOD COMMA EXP EUL PI SQRT ABS COS SIN OPEN CLOSE ENDOFLINE EMPTY
 %type <value> expr
 %type <value> term
 %type <value> factor
@@ -72,6 +73,8 @@ final   : MOD OPEN expr COMMA expr CLOSE { $$ = fmod( $3, $5 ); }
         | EUL POW OPEN expr CLOSE { $$ = pow( e, $4 ); }
         | SQRT OPEN expr CLOSE { $$ = sqrt( $3 ); }
         | ABS OPEN expr CLOSE { $$ = fabs( $3 ); }
+        | COS OPEN expr CLOSE { $$ = cos( $3 ); }
+        | SIN OPEN expr CLOSE { $$ = sin( $3 ); }
         | OPEN expr CLOSE { $$ = $2; }
         | PI { $$ = pi; }
         | NUM { $$ = $1; }
