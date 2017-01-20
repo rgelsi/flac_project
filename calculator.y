@@ -68,7 +68,7 @@ int lcm(int a, int b) {
 %%
 
 line    : // Empty
-        | expr {ans = $1; printf("%f",$1); prompt;} ENDOFLINE line
+        | expr {ans = $1; printf("%.11g",$1); prompt;} ENDOFLINE line
         ;
 
 expr    : expr PLUS term PROZENT { $$ = $1 + $1 * $3 / 100; }
