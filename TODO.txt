@@ -22,6 +22,7 @@ TI-92
                                     ans*3 = 15
 
 ✓- Compare funktion: vergleicht 2 Zahlen und gibt 1 zurück wenn die erste größer ist, 2 wenn die 2. größer ist und 0 wenn sie gleich groß sind
+✓- Logische Operatoren: NOT, AND, OR, NAND, NOR, XOR: immer mit 2 Parametern. Ist einer der Parameter nicht 0 oder 1, wird -1 zurückgegeben
 
 
 
