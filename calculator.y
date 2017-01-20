@@ -63,7 +63,7 @@ int lcm(int a, int b) {
 %type <value> sumlist
 %type <value> prodlist
 %type <value> meanlist
-%type <digit> dimlist
+%type <value> dimlist
 
 %%
 
@@ -136,7 +136,7 @@ meanlist: expr COMMA meanlist { counter++; $$ = $1 + $3; }
         ;
 
 dimlist : expr COMMA dimlist {  $$ = 1 + $3; }
-        | expr  { counter++; $$ = 1; }
+        | expr  { $$ = 1; }
         | { $$ = 0; }
         ;
 
