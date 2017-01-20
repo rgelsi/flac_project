@@ -11,6 +11,8 @@ int rowno = 1;                          // Number of row
 DIGIT    [0-9]
 NUM      {DIGIT}+(\.{DIGIT}+)?
 
+LIST    \{({NUM}+(\,{NUM})*)?\}
+
 %%
 
 [ \t]+  ;                               // Ignore blank space tab
@@ -32,9 +34,12 @@ NUM      {DIGIT}+(\.{DIGIT}+)?
 [aA][bB][sS]   { return(ABS); }         // Absolute value
 [cC][oO][sS]   { return(COS); }         // Cosinus
 [sS][iI][nN]   { return(SIN); }         // Sinus
+[gG][cC][dD]   { return(GCD); }         // GCD
+[lL][cC][mM]   { return(LCM); }         // LCM
 [mM][eE][aA][nN]   { return(MEAN); }    // Mean of a list
 [sS][uU][mM][lL]   { return(SUML); }    // Sum of a list
 [pP][rR][oO][dD][uU][cC][tT][lL]    { return(PRODL); }    // Sum of a list
+[dD][iI][mM]   { return(DIM); }         // Dimension of a list
 [bB][iI][nN]   { return(BIN); }         // Binary
 [dD][eE][cC]   { return(DEC); }         // Dezimal
 [aA][nN][sS]   { return(ANS); }         // Answer

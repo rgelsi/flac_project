@@ -21,6 +21,20 @@ double fac(double x) {
     }
 }
 
+int gcd (int a, int b) {
+  int c;
+  while ( a != 0 ) {
+     c = a;
+     a = b%a;
+     b = c;
+  }
+  return b;
+}
+
+int lcm(int a, int b) {
+    return (a * b) / gcd(a, b);
+}
+
 
 #define e  2.71828182845904523536028747135266249775724709369995
 #define pi 3.14159265358979323846264338327950288419716939937510
@@ -29,6 +43,7 @@ double fac(double x) {
 %}
 
 %union {
+    char* lexeme;
     double value;			//value of an identifier of type NUM
     int digit;              //value of an identifier of type DIGIT
 }
@@ -36,7 +51,7 @@ double fac(double x) {
 %start line
 %token <value> NUM
 %token <digit> DIGIT
-%left PLUS MINUS MULT DIV POW FACT MOD COMMA EXP EUL PI SQRT ABS COS SIN MEAN SUML PRODL ANS BIN DEC ARROW OPEN CLOSE CURO CURC SQBO SQBC ENDOFLINE EMPTY EXIT
+%left PLUS MINUS MULT DIV POW FACT MOD COMMA EXP EUL PI SQRT ABS COS SIN GCD LCM MEAN SUML PRODL DIM ANS BIN DEC ARROW OPEN CLOSE CURO CURC SQBO SQBC ENDOFLINE EMPTY EXIT
 %right PROZENT
 %type <value> expr
 %type <value> term
@@ -48,6 +63,7 @@ double fac(double x) {
 %type <value> sumlist
 %type <value> prodlist
 %type <value> meanlist
+%type <digit> dimlist
 
 %%
 
@@ -87,29 +103,42 @@ final   : MOD OPEN expr COMMA expr CLOSE { $$ = fmod( $3, $5 ); }
         | ABS OPEN expr CLOSE { $$ = fabs( $3 ); }
         | COS OPEN expr CLOSE { $$ = cos( $3 ); }
         | SIN OPEN expr CLOSE { $$ = sin( $3 ); }
+        | GCD OPEN expr COMMA expr CLOSE { $$ = gcd( $3, $5 ); }
+        | LCM OPEN expr COMMA expr CLOSE { $$ = lcm( $3, $5 ); }
+
         | SUML OPEN CURO sumlist CURC CLOSE { $$ = $4 ; }
         | PRODL OPEN CURO prodlist CURC CLOSE { $$ = $4 ; }
         | MEAN OPEN CURO meanlist CURC CLOSE { $$ = $4 / counter ; counter = 0; }
+        | DIM OPEN CURO dimlist CURC CLOSE { $$ = $4 ; }
+
         | OPEN expr CLOSE { $$ = $2; }
         | PI { $$ = pi; }
         | NUM { $$ = $1; }
         | MINUS NUM { $$ = -$2; }
         | ANS { $$ = ans; }
+
         | EXIT { exit(0); }
         ;
 
 sumlist : expr COMMA sumlist { $$ = $1 + $3; }
         | expr  { $$ = $1; }
+        | { $$ = 0; }
         ;
 
 prodlist: expr COMMA prodlist { $$ = $1 * $3; }
         | expr  { $$ = $1; }
+        | { $$ = 0; }
         ;
 
 meanlist: expr COMMA meanlist { counter++; $$ = $1 + $3; }
         | expr  { counter++; $$ = $1; }
+        | { $$ = 0; }
         ;
 
+dimlist : expr COMMA dimlist {  $$ = 1 + $3; }
+        | expr  { counter++; $$ = 1; }
+        | { $$ = 0; }
+        ;
 
 %%
 
@@ -117,7 +146,9 @@ meanlist: expr COMMA meanlist { counter++; $$ = $1 + $3; }
 
 void yyerror(char *s)
 {
-    printf("%s\n", s);
+    printf("%s", s);
+    prompt;
+    yyparse();
 }
 
 int main(void)
