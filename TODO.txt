@@ -14,13 +14,14 @@ TI-92
 ✓- Summe und Product einer Liste:      suml({1,2,3,4}) und productl({1,2,3,4})
 
 - log10, ln
-- Binär in Dezimal und umgekehrt
+✓- Binär in Dezimal und umgekehrt
 ✓- Mittelwert
 - Summe E(expr,var,low,high):   E(i*2,i,0,10) = 110
 - Produkt -"-
 ✓- Mit vorherigen Ergebnis rechnen:  2+3 = 5
                                     ans*3 = 15
 
+✓- Compare funktion: vergleicht 2 Zahlen und gibt 1 zurück wenn die erste größer ist, 2 wenn die 2. größer ist und 0 wenn sie gleich groß sind
 
 
 
