@@ -6,7 +6,7 @@ TI-92
 ✓- e hoch:           eˆ(3)
 ✓- Facultät:        3!
 ✓- Exponent Nullen: 4E3     = 4000
-- Prozent:          20 - 10% = 18     (20-10%*20 = 18 functioniert)
+- Prozent:          20 - 10% = 18     (20-10%*20 = 18 funktioniert)
 ✓- Modulo:          MOD(10,3)
 ✓- Absolutwert   abs(-3) = 3
 ✓- Kommazahlen:     2.34566
