@@ -37,19 +37,25 @@ int comp(float i, float j)
     return greater;
 }
 
+/* Returns true if a number is 1 or 0, false otherwise */
+int checkIfBinary(int i)
+{
+    return (i == 0 || i == 1) ? 1  : 0;
+}
+
 /* Converts a binary number to a decimal number and returns it. */
 int binToDec(long bin)
 {
     int decimal = 0, i = 0, remainder;
     while (bin!=0)
     {
-        if(bin%10 == 0 || bin%10 == 1){
-            remainder = bin%10;
+        remainder = bin%10;
+        if(checkIfBinary(remainder) == 1){
             bin /= 10;
             decimal += remainder*pow(2,i);
             ++i;
         } else {
-            bin /= 10;
+            yyerror("Not Binary");
         }
     }
     return decimal;
@@ -71,12 +77,6 @@ long decToBin(int dec)
     return binary;
 }
 
-/* Returns true if a number is 1 or 0, false otherwise */
-int checkIfBinary(int i)
-{
-    return (i == 0 || i == 1) ? 1  : 0;
-}
-
 /* Logical NOT operation */
 int not(int i)
 {
@@ -85,6 +85,9 @@ int not(int i)
         result = 0;
     else if (i==0)
         result = 1;
+    else{
+        yyerror("Not Binary");
+    }
     return result;
 }
 
@@ -93,9 +96,11 @@ int and(int i, int j)
 {
     int result = -1;
     // If the sum == 2, it means that both functions must have returned 1
-    if((checkIfBinary(i) + checkIfBinary(0)) == 2)
+    if((checkIfBinary(i) + checkIfBinary(j)) == 2)
     {
         result = (i+j == 2) ? 1 : 0;
+    }else{
+        yyerror("Not Binary");
     }
     return result;
 }
@@ -105,9 +110,11 @@ int or(int i, int j)
 {
     int result = -1;
     // If the sum == 2, it means that both functions must have returned 1
-    if((checkIfBinary(i) + checkIfBinary(0)) == 2)
+    if((checkIfBinary(i) + checkIfBinary(j)) == 2)
     {
         result = (i+j > 0 ) ? 1 : 0;
+    }else{
+        yyerror("Not Binary");
     }
     return result;
 }
@@ -117,9 +124,11 @@ int nand(int i, int j)
 {
     int result = -1;
     // If the sum == 2, it means that both functions must have returned 1
-    if((checkIfBinary(i) + checkIfBinary(0)) == 2)
+    if((checkIfBinary(i) + checkIfBinary(j)) == 2)
     {
         result = (i+j < 2) ? 1 : 0;
+    }else{
+        yyerror("Not Binary");
     }
     return result;
 }
@@ -129,9 +138,11 @@ int nor(int i, int j)
 {
     int result = -1;
     // If the sum == 2, it means that both functions must have returned 1
-    if((checkIfBinary(i) + checkIfBinary(0)) == 2)
+    if((checkIfBinary(i) + checkIfBinary(j)) == 2)
     {
         result = (i+j > 0 ) ? 0 : 1;
+    }else{
+        yyerror("Not Binary");
     }
     return result;
 }
@@ -141,10 +152,11 @@ int xor(int i, int j)
 {
     int result = -1;
     // If the sum == 2, it means that both functions must have returned 1
-    if((checkIfBinary(i) + checkIfBinary(0)) == 2)
+    if((checkIfBinary(i) + checkIfBinary(j)) == 2)
     {
         result = (i+j == 1 ) ? 1 : 0;
+    }else{
+        yyerror("Not Binary");
     }
     return result;
 }
-

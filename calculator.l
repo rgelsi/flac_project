@@ -26,15 +26,19 @@ ID       {LETTER}({LETTER}|{DIGIT})*
 "-"     { return(MINUS); }
 "*"     { return(MULT); }
 "/"     { return(DIV); }
-"%"     { return(PER); }                    // Percent
 "^"     { return(POW); }                    // Power
 "!"     { return(FACT); }                   // Factorial
+"%"     { return(PER); }                    // Percent
 "E"     { return(EXP); }                    // E notation
 "e"     { return(EUL); }                    // Constant e
 [pP][iI]        { return(PI); }             // Constant PI
 [mM][oO][dD]    { return(MOD); }            // Modulo
 [sS][qQ][rR][tT]   { return(SQRT); }        // Square root
+[cC][bB][rR][tT]   { return(CBRT); }        // Cubic root
+[hH][yY][pP][oO][tT]   { return(HYPOT); }
 [aA][bB][sS]   { return(ABS); }             // Absolute value
+
+[rR][aA][nN][dD]   { return(RAND); }             // Dimension of a list
 
 [sS][iI][nN]   { return(SIN); }             // Sinus
 [cC][oO][sS]   { return(COS); }             // Cosinus
@@ -50,16 +54,23 @@ ID       {LETTER}({LETTER}|{DIGIT})*
 [aA][cC][oO][sS][hH]   { return(ACOSH); }
 [aA][tT][aA][nN][hH]   { return(ATANH); }
 
-[cC][eE][iI][lL] { return(CEIL); }          // Ceil
-[fF][lL][oO][oO][rR] { return(FLOOR); }     // Floor
+[cC][eE][iI][lL][iI][nN][gG] { return(CEIL); }  // Ceiling
+[fF][lL][oO][oO][rR] { return(FLOOR); }         // Floor
 
 [lL][nN]   { return (LN); }                 // Natural logarithm
 [lL][oO][gG]10   { return(LOG10); }         // Log base 10
 
-[cC][bB][rR][tT]   { return(CBRT); }
-[hH][yY][pP][oO][tT]   { return(HYPOT); }
-
 [cC][oO][mM][pP] { return (COMP); }
+
+[gG][cC][dD]   { return(GCD); }             // GCD
+[lL][cC][mM]   { return(LCM); }             // LCM
+
+[mM][eE][aA][nN]   { return(MEAN); }        // Mean of a list
+[vV][aA][rR][iI][aA][nN][cC][eE]   { return(VARIANCE); }        // Variance of a list
+[sS][dD]   { return(SD); }                  // Standard Deviation of a list
+[sS][uU][mM]   { return(SUML); }            // Sum of a list
+[pP][rR][oO][dD][uU][cC][tT]    { return(PRODL); }    // Sum of a list
+[dD][iI][mM]   { return(DIM); }             // Dimension of a list
 
 [bB][iI][nN][tT][oO][dD][eE][cC]  { return (BTD); }     // Binary to Dezimal
 [dD][eE][cC][tT][oO][bB][iI][nN]  { return (DTB); }     // Dezimal to Binary
@@ -67,16 +78,9 @@ ID       {LETTER}({LETTER}|{DIGIT})*
 [nN][oO][tT]    { return (NOT); }
 [aA][nN][dD]    { return (AND); }
 [oO][rR]    { return (OR); }
-[nN][aA][nN][dD]    { return (AND); }
+[nN][aA][nN][dD]    { return (NAND); }
 [nN][oO][rR]    { return (NOR); }
 [xX][oO][rR]    { return (XOR); }
-
-[gG][cC][dD]   { return(GCD); }             // GCD
-[lL][cC][mM]   { return(LCM); }             // LCM
-[mM][eE][aA][nN]   { return(MEAN); }        // Mean of a list
-[sS][uU][mM][lL]   { return(SUML); }        // Sum of a list
-[pP][rR][oO][dD][uU][cC][tT][lL]    { return(PRODL); }    // Sum of a list
-[dD][iI][mM]   { return(DIM); }             // Dimension of a list
 
 [aA][nN][sS]   { return(ANS); }             // Answer
 

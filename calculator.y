@@ -4,8 +4,6 @@ void yyerror(char *s);
 
 double ans = 0;
 
-int counter = 0;
-
 int rowno = 1;                          // Number of row
 
 #include <stdlib.h>
@@ -19,13 +17,38 @@ int rowno = 1;                          // Number of row
 #define e  2.71828182845904523536028747135266249775724709369995
 #define pi 3.14159265358979323846264338327950288419716939937510
 
+struct list_node {
+    struct list_node  *next;
+    double            value;
+};
+struct list {
+    struct list_node  *head, **tail;
+};
+
+struct list *new_list() {
+    struct list *new_list = malloc(sizeof(struct list));
+    new_list->head = 0;
+    new_list->tail = &new_list->head;
+    return new_list;
+}
+
+void push_back(struct list *list, double value) {
+    struct list_node *node = malloc(sizeof(struct list_node));
+    node->next = 0;
+    node->value = value;
+    *list->tail = node;
+    list->tail = &node->next;
+}
+
 #define prompt printf("\n%3d : ",++rowno)
 %}
+
 
 %union {
     char* lexeme;
     double value;			//value of an identifier of type NUM
     int digit;              //value of an identifier of type DIGIT
+    struct list *data_list;
 }
 
 %start line
@@ -33,7 +56,7 @@ int rowno = 1;                          // Number of row
 %token <value> NUM
 %token <digit> DIGIT
 
-%left PLUS MINUS MULT DIV POW FACT MOD COMMA EXP EUL PI SQRT ABS GCD LCM MEAN SUML PRODL DIM ANS BIN DEC ARROW OPEN CLOSE CURO CURC SQBO SQBC ENDOFLINE EMPTY EXIT
+%left PLUS MINUS MULT DIV POW FACT MOD COMMA EXP EUL PI SQRT ABS RAND GCD LCM MEAN VARIANCE SD SUML PRODL DIM ANS BIN DEC ARROW OPEN CLOSE CURO CURC SQBO SQBC ENDOFLINE EMPTY EXIT
 %left COS SIN TAN SINH COSH TANH ASIN ACOS ATAN ATAN2 ASINH ACOSH ATANH CEIL FLOOR LN LOG10 CBRT HYPOT PER COMP BTD DTB NOT AND OR NAND NOR XOR
 %right PROZENT
 
@@ -44,9 +67,7 @@ int rowno = 1;                          // Number of row
 %type <value> exponent
 %type <value> percent
 %type <value> final
-%type <value> sumlist
-%type <value> prodlist
-%type <value> meanlist
+%type <data_list> list
 %type <value> dimlist
 
 %token <lexeme> ID
@@ -89,6 +110,7 @@ final   : MOD OPEN expr COMMA expr CLOSE { $$ = fmod( $3, $5 ); }
         | ABS OPEN expr CLOSE { $$ = fabs( $3 ); }
         | GCD OPEN expr COMMA expr CLOSE { $$ = gcd( $3, $5 ); }
         | LCM OPEN expr COMMA expr CLOSE { $$ = lcm( $3, $5 ); }
+        | RAND OPEN CLOSE { $$ =  (double)rand() / (double)RAND_MAX; }
 
         | SIN OPEN expr CLOSE { $$ = sin( $3 ); }
         | COS OPEN expr CLOSE { $$ = cos( $3 ); }
@@ -123,9 +145,88 @@ final   : MOD OPEN expr COMMA expr CLOSE { $$ = fmod( $3, $5 ); }
         | XOR OPEN expr COMMA expr CLOSE { $$ = xor( $3, $5 ); }
         | NOT OPEN expr CLOSE { $$ = not( $3 ); }
 
-        | SUML OPEN CURO sumlist CURC CLOSE { $$ = $4 ; }
-        | PRODL OPEN CURO prodlist CURC CLOSE { $$ = $4 ; }
-        | MEAN OPEN CURO meanlist CURC CLOSE { $$ = $4 / counter ; counter = 0; }
+        | SUML OPEN CURO list CURC CLOSE {
+            struct list_node *cursor = malloc(sizeof(struct list_node));
+            double sum = 0;
+            if($4 != NULL){
+                cursor = $4->head;
+                while(cursor != NULL){
+                    sum = sum + cursor->value;
+                    cursor = cursor->next;
+                }
+            }
+            $$ = sum;
+          }
+        | PRODL OPEN CURO list CURC CLOSE {
+            struct list_node *cursor = malloc(sizeof(struct list_node));
+            double product = 0;
+            if($4 != NULL){
+                cursor = $4->head;
+                product = cursor->value;
+                cursor = cursor->next;
+                while(cursor != NULL){
+                    product = product * cursor->value;
+                    cursor = cursor->next;
+                }
+            }
+            $$ = product;
+          }
+        | MEAN OPEN CURO list CURC CLOSE {
+            struct list_node *cursor = malloc(sizeof(struct list_node));
+            double sum = 0;
+            int counter = 0;
+            if($4 != NULL){
+                cursor = $4->head;
+                while(cursor != NULL){
+                    sum = sum + cursor->value;
+                    counter = counter + 1;
+                    cursor = cursor->next;
+                }
+            }
+            $$ = sum / counter;
+          }
+        | VARIANCE OPEN CURO list CURC CLOSE {
+            struct list_node *cursor = malloc(sizeof(struct list_node));
+            double sum = 0;
+            double sum2 = 0;
+            int counter = 0;
+            if($4 != NULL){
+                cursor = $4->head;
+                while(cursor != NULL){
+                    sum = sum + cursor->value;
+                    counter = counter + 1;
+                    cursor = cursor->next;
+                }
+                double mean = sum / counter;
+                cursor = $4->head;
+                while(cursor != NULL){
+                    sum2 = sum2 + pow((cursor->value - mean), 2);
+                    cursor = cursor->next;
+                }
+            }
+            $$ = sum2 / counter;
+          }
+        | SD OPEN CURO list CURC CLOSE {
+            struct list_node *cursor = malloc(sizeof(struct list_node));
+            double sum = 0;
+            double sum2 = 0;
+            int counter = 0;
+            if($4 != NULL){
+                cursor = $4->head;
+                while(cursor != NULL){
+                    sum = sum + cursor->value;
+                    counter = counter + 1;
+                    cursor = cursor->next;
+                }
+                double mean = sum / counter;
+                cursor = $4->head;
+                while(cursor != NULL){
+                    sum2 = sum2 + pow((cursor->value - mean), 2);
+                    cursor = cursor->next;
+                }
+            }
+            $$ = sqrt(sum2 / counter);
+          }
         | DIM OPEN CURO dimlist CURC CLOSE { $$ = $4 ; }
 
         | OPEN expr CLOSE { $$ = $2; }
@@ -137,20 +238,11 @@ final   : MOD OPEN expr COMMA expr CLOSE { $$ = fmod( $3, $5 ); }
         | EXIT { exit(0); }
         ;
 
-sumlist : expr COMMA sumlist { $$ = $1 + $3; }
-        | expr  { $$ = $1; }
-        | { $$ = 0; }
+list    : expr { push_back($$ = new_list(), $1); }
+        | list COMMA expr { push_back($$ = $1, $3); }
+        | { $$ = NULL; }
         ;
 
-prodlist: expr COMMA prodlist { $$ = $1 * $3; }
-        | expr  { $$ = $1; }
-        | { $$ = 0; }
-        ;
-
-meanlist: expr COMMA meanlist { counter++; $$ = $1 + $3; }
-        | expr  { counter++; $$ = $1; }
-        | { $$ = 0; }
-        ;
 
 dimlist : expr COMMA dimlist {  $$ = 1 + $3; }
         | expr  { $$ = 1; }
