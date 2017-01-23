@@ -11,9 +11,6 @@ NUM      {DIGIT}+(\.{DIGIT}+)?
 
 LIST    \{({NUM}+(\,{NUM})*)?\}
 
-LETTER   [a-zA-Z]
-ID       {LETTER}({LETTER}|{DIGIT})*
-
 %%
 
 [ \t]+  ;                                   // Ignore blank space tab
@@ -37,8 +34,13 @@ ID       {LETTER}({LETTER}|{DIGIT})*
 [cC][bB][rR][tT]   { return(CBRT); }        // Cubic root
 [hH][yY][pP][oO][tT]   { return(HYPOT); }
 [aA][bB][sS]   { return(ABS); }             // Absolute value
+[iI][nN][tT][dD][iI][vV]   { return(INTDIV); }             // Absolute value
 
-[rR][aA][nN][dD]   { return(RAND); }             // Dimension of a list
+[gG][cC][dD]   { return(GCD); }             // GCD
+[lL][cC][mM]   { return(LCM); }             // LCM
+
+[lL][nN]   { return (LN); }                 // Natural logarithm
+[lL][oO][gG]10   { return(LOG10); }         // Log base 10
 
 [sS][iI][nN]   { return(SIN); }             // Sinus
 [cC][oO][sS]   { return(COS); }             // Cosinus
@@ -57,20 +59,20 @@ ID       {LETTER}({LETTER}|{DIGIT})*
 [cC][eE][iI][lL][iI][nN][gG] { return(CEIL); }  // Ceiling
 [fF][lL][oO][oO][rR] { return(FLOOR); }         // Floor
 
-[lL][nN]   { return (LN); }                 // Natural logarithm
-[lL][oO][gG]10   { return(LOG10); }         // Log base 10
+[rR][aA][nN][dD]   { return(RAND); }            // Dimension of a list
 
-[cC][oO][mM][pP] { return (COMP); }
+[cC][oO][mM][pP] { return (COMP); }             // Compare two numbers
 
-[gG][cC][dD]   { return(GCD); }             // GCD
-[lL][cC][mM]   { return(LCM); }             // LCM
-
-[mM][eE][aA][nN]   { return(MEAN); }        // Mean of a list
-[vV][aA][rR][iI][aA][nN][cC][eE]   { return(VARIANCE); }        // Variance of a list
-[sS][dD]   { return(SD); }                  // Standard Deviation of a list
-[sS][uU][mM]   { return(SUML); }            // Sum of a list
-[pP][rR][oO][dD][uU][cC][tT]    { return(PRODL); }    // Sum of a list
-[dD][iI][mM]   { return(DIM); }             // Dimension of a list
+[mM][eE][aA][nN]   { return(MEAN); }                        // Mean of a list
+[vV][aA][rR][iI][aA][nN][cC][eE]   { return(VARIANCE); }    // Variance of a list
+[sS][dD]   { return(SD); }                                  // Standard Deviation of a list
+[sS][uU][mM]   { return(SUM); }                             // Sum of a list
+[pP][rR][oO][dD][uU][cC][tT]    { return(PROD); }           // Sum of a list
+[dD][iI][mM]   { return(DIM); }                             // Dimension of a list
+[dD][oO][tT][pP]   { return(DOTP); }                        // Dot product of a list
+[mM][aA][xX]   { return(MAX); }                             // The maximum element in a list
+[mM][iI][nN]   { return(MIN); }                             // The minimum element in a list
+[pP][oO][lL][yY][eE][vV][aA][lL]   { return(POLYEVAL); }    // The polynomial evaluated for the value of the second argument
 
 [bB][iI][nN][tT][oO][dD][eE][cC]  { return (BTD); }     // Binary to Dezimal
 [dD][eE][cC][tT][oO][bB][iI][nN]  { return (DTB); }     // Dezimal to Binary
@@ -82,7 +84,7 @@ ID       {LETTER}({LETTER}|{DIGIT})*
 [nN][oO][rR]    { return (NOR); }
 [xX][oO][rR]    { return (XOR); }
 
-[aA][nN][sS]   { return(ANS); }             // Answer
+[aA][nN][sS]   { return(ANS); }             // Previous result
 
 ","     { return(COMMA); }                  // Separate expressions
 "("     { return(OPEN); }
@@ -95,9 +97,6 @@ ID       {LETTER}({LETTER}|{DIGIT})*
 
 
 [eE][xX][iI][tT]   { return(EXIT); }    // Exit
-
-{ID}     {yylval.lexeme = strdup(yytext);
-          return ID;}
 
 . return yytext[0];
 %%

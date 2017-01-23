@@ -40,12 +40,23 @@ void push_back(struct list *list, double value) {
     list->tail = &node->next;
 }
 
+int getListLength(struct list *list){
+    struct list_node *cursor = malloc(sizeof(struct list_node));
+    int counter = 0;
+    cursor = list->head;
+    while(cursor != NULL){
+        counter = counter + 1;
+        cursor = cursor->next;
+    }
+    return counter;
+}
+
+
 #define prompt printf("\n%3d : ",++rowno)
 %}
 
 
 %union {
-    char* lexeme;
     double value;			//value of an identifier of type NUM
     int digit;              //value of an identifier of type DIGIT
     struct list *data_list;
@@ -56,8 +67,10 @@ void push_back(struct list *list, double value) {
 %token <value> NUM
 %token <digit> DIGIT
 
-%left PLUS MINUS MULT DIV POW FACT MOD COMMA EXP EUL PI SQRT ABS RAND GCD LCM MEAN VARIANCE SD SUML PRODL DIM ANS BIN DEC ARROW OPEN CLOSE CURO CURC SQBO SQBC ENDOFLINE EMPTY EXIT
-%left COS SIN TAN SINH COSH TANH ASIN ACOS ATAN ATAN2 ASINH ACOSH ATANH CEIL FLOOR LN LOG10 CBRT HYPOT PER COMP BTD DTB NOT AND OR NAND NOR XOR
+%left PLUS MINUS MULT DIV POW FACT PER MOD EXP EUL PI SQRT CBRT HYPOT LN LOG10 ABS RAND GCD LCM INTDIV ANS BIN DEC ARROW
+%left MEAN VARIANCE SD SUM PROD DIM DOTP MAX MIN POLYEVAL
+%left COS SIN TAN SINH COSH TANH ASIN ACOS ATAN ATAN2 ASINH ACOSH ATANH CEIL FLOOR COMP BTD DTB NOT AND OR NAND NOR XOR
+%left COMMA OPEN CLOSE CURO CURC SQBO SQBC ENDOFLINE EMPTY EXIT
 %right PROZENT
 
 %type <value> expr
@@ -69,8 +82,8 @@ void push_back(struct list *list, double value) {
 %type <value> final
 %type <data_list> list
 %type <value> dimlist
-
-%token <lexeme> ID
+%type <value> maxlist
+%type <value> minlist
 
 %%
 
@@ -107,10 +120,15 @@ percent : percent PER { $$ = $1 / 100; }
 final   : MOD OPEN expr COMMA expr CLOSE { $$ = fmod( $3, $5 ); }
         | EUL POW OPEN expr CLOSE { $$ = pow( e, $4 ); }
         | SQRT OPEN expr CLOSE { $$ = sqrt( $3 ); }
+        | CBRT OPEN expr CLOSE { $$ = cbrt( $3 ); }
+        | HYPOT OPEN expr COMMA expr CLOSE { $$ = hypot( $3, $5 ); }
         | ABS OPEN expr CLOSE { $$ = fabs( $3 ); }
         | GCD OPEN expr COMMA expr CLOSE { $$ = gcd( $3, $5 ); }
         | LCM OPEN expr COMMA expr CLOSE { $$ = lcm( $3, $5 ); }
-        | RAND OPEN CLOSE { $$ =  (double)rand() / (double)RAND_MAX; }
+        | INTDIV OPEN expr COMMA expr CLOSE { div_t res = div($3, $5); $$ = res.quot;}
+
+        | LN OPEN expr CLOSE { $$ = log( $3 ); }
+        | LOG10 OPEN expr CLOSE { $$ = log10( $3 ); }
 
         | SIN OPEN expr CLOSE { $$ = sin( $3 ); }
         | COS OPEN expr CLOSE { $$ = cos( $3 ); }
@@ -129,10 +147,8 @@ final   : MOD OPEN expr COMMA expr CLOSE { $$ = fmod( $3, $5 ); }
         | CEIL OPEN expr CLOSE { $$ = ceil( $3 ); }
         | FLOOR OPEN expr CLOSE { $$ = floor( $3 ); }
 
-        | LN OPEN expr CLOSE { $$ = log( $3 ); }
-        | LOG10 OPEN expr CLOSE { $$ = log10( $3 ); }
-        | CBRT OPEN expr CLOSE { $$ = cbrt( $3 ); }
-        | HYPOT OPEN expr COMMA expr CLOSE { $$ = hypot( $3, $5 ); }
+        | RAND OPEN CLOSE { $$ =  (double)rand() / (double)RAND_MAX; }
+
         | COMP OPEN expr COMMA expr CLOSE { $$ = comp( $3, $5 ); }
         
         | BTD OPEN expr CLOSE { $$ = binToDec( $3 ); }
@@ -145,19 +161,19 @@ final   : MOD OPEN expr COMMA expr CLOSE { $$ = fmod( $3, $5 ); }
         | XOR OPEN expr COMMA expr CLOSE { $$ = xor( $3, $5 ); }
         | NOT OPEN expr CLOSE { $$ = not( $3 ); }
 
-        | SUML OPEN CURO list CURC CLOSE {
+        | SUM OPEN CURO list CURC CLOSE {
             struct list_node *cursor = malloc(sizeof(struct list_node));
             double sum = 0;
             if($4 != NULL){
                 cursor = $4->head;
                 while(cursor != NULL){
-                    sum = sum + cursor->value;
+                    sum += cursor->value;
                     cursor = cursor->next;
                 }
             }
             $$ = sum;
           }
-        | PRODL OPEN CURO list CURC CLOSE {
+        | PROD OPEN CURO list CURC CLOSE {
             struct list_node *cursor = malloc(sizeof(struct list_node));
             double product = 0;
             if($4 != NULL){
@@ -165,7 +181,7 @@ final   : MOD OPEN expr COMMA expr CLOSE { $$ = fmod( $3, $5 ); }
                 product = cursor->value;
                 cursor = cursor->next;
                 while(cursor != NULL){
-                    product = product * cursor->value;
+                    product *= cursor->value;
                     cursor = cursor->next;
                 }
             }
@@ -178,8 +194,8 @@ final   : MOD OPEN expr COMMA expr CLOSE { $$ = fmod( $3, $5 ); }
             if($4 != NULL){
                 cursor = $4->head;
                 while(cursor != NULL){
-                    sum = sum + cursor->value;
-                    counter = counter + 1;
+                    sum += cursor->value;
+                    counter += 1;
                     cursor = cursor->next;
                 }
             }
@@ -190,44 +206,85 @@ final   : MOD OPEN expr COMMA expr CLOSE { $$ = fmod( $3, $5 ); }
             double sum = 0;
             double sum2 = 0;
             int counter = 0;
-            if($4 != NULL){
+            if($4 != NULL && getListLength($4) > 1){
                 cursor = $4->head;
                 while(cursor != NULL){
-                    sum = sum + cursor->value;
-                    counter = counter + 1;
+                    sum += cursor->value;
+                    counter += 1;
                     cursor = cursor->next;
                 }
                 double mean = sum / counter;
                 cursor = $4->head;
                 while(cursor != NULL){
-                    sum2 = sum2 + pow((cursor->value - mean), 2);
+                    sum2 += pow((cursor->value - mean), 2);
                     cursor = cursor->next;
                 }
+                $$ = sum2 / counter;
+            }else{
+                yyerror("Dimension");
             }
-            $$ = sum2 / counter;
           }
         | SD OPEN CURO list CURC CLOSE {
             struct list_node *cursor = malloc(sizeof(struct list_node));
             double sum = 0;
             double sum2 = 0;
             int counter = 0;
-            if($4 != NULL){
+            if($4 != NULL && getListLength($4) > 1){
                 cursor = $4->head;
                 while(cursor != NULL){
-                    sum = sum + cursor->value;
+                    sum += cursor->value;
                     counter = counter + 1;
                     cursor = cursor->next;
                 }
                 double mean = sum / counter;
                 cursor = $4->head;
                 while(cursor != NULL){
-                    sum2 = sum2 + pow((cursor->value - mean), 2);
+                    sum2 += pow((cursor->value - mean), 2);
                     cursor = cursor->next;
                 }
+                $$ = sqrt(sum2 / counter);
+            }else{
+                yyerror("Dimension");
             }
-            $$ = sqrt(sum2 / counter);
+          }
+        | DOTP OPEN CURO list CURC COMMA CURO list CURC CLOSE {
+            struct list_node *cursor1 = malloc(sizeof(struct list_node));
+            struct list_node *cursor2 = malloc(sizeof(struct list_node));
+            double dotp = 0;
+            if($4 == NULL && $8 == NULL){
+                $$ = dotp;
+            }else if($4 != NULL && $8 != NULL && getListLength($4) == getListLength($8)){
+                cursor1 = $4->head;
+                cursor2 = $8->head;
+                while(cursor1 != NULL){
+                    dotp += (cursor1->value * cursor2->value);
+                    cursor1 = cursor1->next;
+                    cursor2 = cursor2->next;
+                }
+                $$ = dotp;
+            }else{
+                yyerror("Data type");
+            }
+          }
+        | POLYEVAL OPEN CURO list CURC COMMA expr CLOSE {
+            struct list_node *cursor = malloc(sizeof(struct list_node));
+            double poly = 0;
+            if($4 == NULL){
+                $$ = poly;
+            }else{
+                cursor = $4->head;
+                int exp_counter = getListLength($4)-1;
+                while(cursor != NULL){
+                    poly += (cursor->value * pow($7, exp_counter));
+                    exp_counter -= 1;
+                    cursor = cursor->next;
+                }
+                $$ = poly;
+            }
           }
         | DIM OPEN CURO dimlist CURC CLOSE { $$ = $4 ; }
+        | MAX OPEN CURO maxlist CURC CLOSE { $$ = $4 ; }
+        | MIN OPEN CURO minlist CURC CLOSE { $$ = $4 ; }
 
         | OPEN expr CLOSE { $$ = $2; }
         | PI { $$ = pi; }
@@ -249,6 +306,28 @@ dimlist : expr COMMA dimlist {  $$ = 1 + $3; }
         | { $$ = 0; }
         ;
 
+maxlist : expr COMMA maxlist {
+              if($1 > $3){
+                $$ = $1;
+              }else{
+                $$ = $3;
+              }
+          }
+        | expr  { $$ = $1; }
+        | { yyerror("Dimension"); }
+        ;
+
+minlist : expr COMMA minlist {
+              if($1 > $3){
+                $$ = $3;
+              }else{
+                $$ = $1;
+              }
+          }
+        | expr  { $$ = $1; }
+        | { yyerror("Dimension"); }
+        ;
+
 %%
 
 #include "lex.yy.c"
@@ -262,15 +341,15 @@ void yyerror(char *s)
 
 int main(void)
 {
- printf("%3d : ", rowno);
- yyparse();
- return(0);
+    printf("%3d : ", rowno);
+    yyparse();
+    return(0);
 }
 
 // Debug
 /*main()
 {
-  extern int yydebug;
-  yydebug = 1;
-  return yyparse();
+    extern int yydebug;
+    yydebug = 1;
+    return yyparse();
 }*/
