@@ -27,14 +27,14 @@ struct list {
 
 struct list *new_list() {
     struct list *new_list = malloc(sizeof(struct list));
-    new_list->head = 0;
+    new_list->head = NULL;
     new_list->tail = &new_list->head;
     return new_list;
 }
 
 void push_back(struct list *list, double value) {
     struct list_node *node = malloc(sizeof(struct list_node));
-    node->next = 0;
+    node->next = NULL;
     node->value = value;
     *list->tail = node;
     list->tail = &node->next;
@@ -198,8 +198,10 @@ final   : MOD OPEN expr COMMA expr CLOSE { $$ = fmod( $3, $5 ); }
                     counter += 1;
                     cursor = cursor->next;
                 }
+                $$ = sum / counter;
+            }else{
+                yyerror("undef");
             }
-            $$ = sum / counter;
           }
         | VARIANCE OPEN CURO list CURC CLOSE {
             struct list_node *cursor = malloc(sizeof(struct list_node));
