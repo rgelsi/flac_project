@@ -11,6 +11,9 @@ NUM      {DIGIT}+(\.{DIGIT}+)?
 
 LIST    \{({NUM}+(\,{NUM})*)?\}
 
+LETTER   [a-zA-Z]
+ID       {LETTER}(({LETTER}|{DIGIT}){0,7})
+
 %%
 
 [ \t]+  ;                                   // Ignore blank space tab
@@ -27,7 +30,7 @@ LIST    \{({NUM}+(\,{NUM})*)?\}
 "!"     { return(FACT); }                   // Factorial
 "%"     { return(PER); }                    // Percent
 "E"     { return(EXP); }                    // E notation
-"e"     { return(EUL); }                    // Constant e
+"e^("   { return(EUL); }                    // Constant e to the power x
 [pP][iI]        { return(PI); }             // Constant PI
 [mM][oO][dD]    { return(MOD); }            // Modulo
 [sS][qQ][rR][tT]   { return(SQRT); }        // Square root
@@ -93,10 +96,16 @@ LIST    \{({NUM}+(\,{NUM})*)?\}
 "}"     { return(CURC); }
 "["     { return(SQBO); }
 "]"     { return(SQBC); }
-"->"    { return(ARROW); }
+"->"    { return(ASSIGN); }
 
 
 [eE][xX][iI][tT]   { return(EXIT); }    // Exit
 
-. return yytext[0];
+{ID}    {
+            yylval.lexeme = malloc(strlen(yytext)+1);
+            strcpy(yylval.lexeme, yytext);
+            return ID;
+        }
+
+. {};
 %%

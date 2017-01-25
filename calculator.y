@@ -2,10 +2,6 @@
 int yylex();
 void yyerror(char *s);
 
-double ans = 0;
-
-int rowno = 1;                          // Number of row
-
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
@@ -13,10 +9,24 @@ int rowno = 1;                          // Number of row
 #include <math.h>
 
 #include "myFunctions.h"
+#include "uthash_library/uthash.h"
+
+double ans = 0;                          // Previous result
+int lineno = 1;                          // Number of current line
 
 #define e  2.71828182845904523536028747135266249775724709369995
 #define pi 3.14159265358979323846264338327950288419716939937510
 
+// Hashtable to store the ID's with their value
+struct id_struct {
+    char name[8];         // Key
+    double value;         // Value
+    UT_hash_handle hh;
+};
+
+struct id_struct *idTable = NULL;
+
+// Linked List to store a list of numbers
 struct list_node {
     struct list_node  *next;
     double            value;
@@ -25,6 +35,7 @@ struct list {
     struct list_node  *head, **tail;
 };
 
+// Return a new list
 struct list *new_list() {
     struct list *new_list = malloc(sizeof(struct list));
     new_list->head = NULL;
@@ -32,6 +43,7 @@ struct list *new_list() {
     return new_list;
 }
 
+// Add an element at the end of the list
 void push_back(struct list *list, double value) {
     struct list_node *node = malloc(sizeof(struct list_node));
     node->next = NULL;
@@ -40,6 +52,7 @@ void push_back(struct list *list, double value) {
     list->tail = &node->next;
 }
 
+// Get the length of the list
 int getListLength(struct list *list){
     struct list_node *cursor = malloc(sizeof(struct list_node));
     int counter = 0;
@@ -52,11 +65,12 @@ int getListLength(struct list *list){
 }
 
 
-#define prompt printf("\n%3d : ",++rowno)
+#define prompt printf("\n%3d : ",++lineno)
 %}
 
 
 %union {
+    char* lexeme;			//identifier
     double value;			//value of an identifier of type NUM
     int digit;              //value of an identifier of type DIGIT
     struct list *data_list;
@@ -66,12 +80,14 @@ int getListLength(struct list *list){
 
 %token <value> NUM
 %token <digit> DIGIT
+%token <lexeme> ID
 
-%left PLUS MINUS MULT DIV POW FACT PER MOD EXP EUL PI SQRT CBRT HYPOT LN LOG10 ABS RAND GCD LCM INTDIV ANS BIN DEC ARROW
-%left MEAN VARIANCE SD SUM PROD DIM DOTP MAX MIN POLYEVAL
-%left COS SIN TAN SINH COSH TANH ASIN ACOS ATAN ATAN2 ASINH ACOSH ATANH CEIL FLOOR COMP BTD DTB NOT AND OR NAND NOR XOR
-%left COMMA OPEN CLOSE CURO CURC SQBO SQBC ENDOFLINE EMPTY EXIT
-%right PROZENT
+%token PLUS MINUS MULT DIV POW FACT PER MOD EXP EUL PI SQRT CBRT HYPOT LN LOG10 ABS GCD LCM INTDIV BIN DEC
+%token MEAN VARIANCE SD SUM PROD DIM DOTP MAX MIN POLYEVAL
+%token COS SIN TAN SINH COSH TANH ASIN ACOS ATAN ATAN2 ASINH ACOSH ATANH CEIL FLOOR COMP BTD DTB NOT AND OR NAND NOR XOR
+%token ANS RAND ASSIGN COMMA OPEN CLOSE CURO CURC SQBO SQBC ENDOFLINE EMPTY EXIT
+%token PROZENT
+
 
 %type <value> expr
 %type <value> term
@@ -88,7 +104,24 @@ int getListLength(struct list *list){
 %%
 
 line    : // Empty
-        | expr {ans = $1; printf("%.11g",$1); prompt;} ENDOFLINE line
+        | expr ASSIGN ID {
+                    struct id_struct *s = NULL;
+                    s = (struct id_struct*)malloc(sizeof(struct id_struct));
+                    strncpy(s->name, $3, 8);
+                    s->value = $1;
+                    HASH_ADD_STR( idTable, name, s );
+                    ans = $1;
+                    printf("%.11g",$1);
+                    prompt;
+          } ENDOFLINE line
+        | expr {
+                    ans = $1;
+                    printf("%.11g",$1);
+                    prompt;
+          } ENDOFLINE line
+        | expr ASSIGN ID error ENDOFLINE { yyerrok; yyclearin; } line
+        | expr error ENDOFLINE { yyerrok; yyclearin; } line
+        | error ENDOFLINE { yyerrok; yyclearin; } line
         ;
 
 expr    : expr PLUS term { $$ = $1 + $3; }
@@ -118,7 +151,7 @@ percent : percent PER { $$ = $1 / 100; }
         ;
 
 final   : MOD OPEN expr COMMA expr CLOSE { $$ = fmod( $3, $5 ); }
-        | EUL POW OPEN expr CLOSE { $$ = pow( e, $4 ); }
+        | EUL expr CLOSE { $$ = pow( e, $2 ); }
         | SQRT OPEN expr CLOSE { $$ = sqrt( $3 ); }
         | CBRT OPEN expr CLOSE { $$ = cbrt( $3 ); }
         | HYPOT OPEN expr COMMA expr CLOSE { $$ = hypot( $3, $5 ); }
@@ -150,15 +183,15 @@ final   : MOD OPEN expr COMMA expr CLOSE { $$ = fmod( $3, $5 ); }
         | RAND OPEN CLOSE { $$ =  (double)rand() / (double)RAND_MAX; }
 
         | COMP OPEN expr COMMA expr CLOSE { $$ = comp( $3, $5 ); }
-        
-        | BTD OPEN expr CLOSE { $$ = binToDec( $3 ); }
+
+        | BTD OPEN expr CLOSE { double res = binToDec( $3 ); if(res==-1){YYERROR;} $$ = res; }
         | DTB OPEN expr CLOSE { $$ = decToBin( $3 ); }
 
-        | AND OPEN expr COMMA expr CLOSE { $$ = and( $3, $5 ); }
-        | OR OPEN expr COMMA expr CLOSE { $$ = or( $3, $5 ); }
-        | NAND OPEN expr COMMA expr CLOSE { $$ = nand( $3, $5 ); }
-        | NOR OPEN expr COMMA expr CLOSE { $$ = nor( $3, $5 ); }
-        | XOR OPEN expr COMMA expr CLOSE { $$ = xor( $3, $5 ); }
+        | AND OPEN expr COMMA expr CLOSE { double res = and( $3, $5 ); if(res==-1){YYERROR;} $$ = res; }
+        | OR OPEN expr COMMA expr CLOSE { double res = or( $3, $5 ); if(res==-1){YYERROR;} $$ = res; }
+        | NAND OPEN expr COMMA expr CLOSE { double res = nand( $3, $5 ); if(res==-1){YYERROR;} $$ = res; }
+        | NOR OPEN expr COMMA expr CLOSE { double res = nor( $3, $5 ); if(res==-1){YYERROR;} $$ = res;}
+        | XOR OPEN expr COMMA expr CLOSE { double res = xor( $3, $5 ); if(res==-1){YYERROR;} $$ = res; }
         | NOT OPEN expr CLOSE { $$ = not( $3 ); }
 
         | SUM OPEN CURO list CURC CLOSE {
@@ -201,6 +234,7 @@ final   : MOD OPEN expr COMMA expr CLOSE { $$ = fmod( $3, $5 ); }
                 $$ = sum / counter;
             }else{
                 yyerror("undef");
+                YYERROR;
             }
           }
         | VARIANCE OPEN CURO list CURC CLOSE {
@@ -224,6 +258,7 @@ final   : MOD OPEN expr COMMA expr CLOSE { $$ = fmod( $3, $5 ); }
                 $$ = sum2 / counter;
             }else{
                 yyerror("Dimension");
+                YYERROR;
             }
           }
         | SD OPEN CURO list CURC CLOSE {
@@ -247,6 +282,7 @@ final   : MOD OPEN expr COMMA expr CLOSE { $$ = fmod( $3, $5 ); }
                 $$ = sqrt(sum2 / counter);
             }else{
                 yyerror("Dimension");
+                YYERROR;
             }
           }
         | DOTP OPEN CURO list CURC COMMA CURO list CURC CLOSE {
@@ -266,6 +302,7 @@ final   : MOD OPEN expr COMMA expr CLOSE { $$ = fmod( $3, $5 ); }
                 $$ = dotp;
             }else{
                 yyerror("Data type");
+                YYERROR;
             }
           }
         | POLYEVAL OPEN CURO list CURC COMMA expr CLOSE {
@@ -293,6 +330,16 @@ final   : MOD OPEN expr COMMA expr CLOSE { $$ = fmod( $3, $5 ); }
         | NUM { $$ = $1; }
         | MINUS NUM { $$ = -$2; }
         | ANS { $$ = ans; }
+        | ID {
+                struct id_struct *s = NULL;
+                HASH_FIND_STR( idTable, $1, s);
+                if(s){
+                    $$ = s->value;
+                }else{
+                    yyerror("Variable not declared");
+                    YYERROR;
+                }
+              }
 
         | EXIT { exit(0); }
         ;
@@ -316,7 +363,7 @@ maxlist : expr COMMA maxlist {
               }
           }
         | expr  { $$ = $1; }
-        | { yyerror("Dimension"); }
+        | { yyerror("Infinity"); YYERROR; }
         ;
 
 minlist : expr COMMA minlist {
@@ -327,7 +374,7 @@ minlist : expr COMMA minlist {
               }
           }
         | expr  { $$ = $1; }
-        | { yyerror("Dimension"); }
+        | { yyerror("-Infinity"); YYERROR; }
         ;
 
 %%
@@ -336,22 +383,14 @@ minlist : expr COMMA minlist {
 
 void yyerror(char *s)
 {
-    printf("%s", s);
+    fprintf (stderr, "%s", s);
+    lineno--;
     prompt;
-    yyparse();
 }
 
 int main(void)
 {
-    printf("%3d : ", rowno);
+    printf("%3d : ", lineno);
     yyparse();
     return(0);
 }
-
-// Debug
-/*main()
-{
-    extern int yydebug;
-    yydebug = 1;
-    return yyparse();
-}*/

@@ -56,6 +56,7 @@ int binToDec(long bin)
             ++i;
         } else {
             yyerror("Not Binary");
+            return -1;
         }
     }
     return decimal;
